@@ -1,0 +1,19 @@
+.table-list {
+    border-right: 1px solid black;
+}
+.table-list > button {
+    display: flex;
+    flex-direction: column;
+    border: none;
+    background-color: transparent;
+    font-size: 1.2rem;
+    margin: auto;
+    padding: 5px;
+}
+.table-list > button:hover {
+    cursor: pointer;
+}
+
+.table-list .active {
+    color: lightblue;
+}

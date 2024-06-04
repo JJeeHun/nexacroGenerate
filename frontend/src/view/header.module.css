@@ -1,0 +1,15 @@
+.nav {
+    display: flex;
+    height: 50px;
+    align-items: center;
+}
+
+.link-button {
+    padding: 10px;
+    color: black;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+}
+.link-button:hover {
+    color: lightblue;
+}
