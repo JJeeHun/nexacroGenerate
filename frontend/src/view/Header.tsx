@@ -15,6 +15,9 @@ export default () => {
                     <Link to="/requires" className={css["link-button"]}>
                         Requires
                     </Link>
+                    <Link to="/crud" className={css["link-button"]}>
+                        CRUD
+                    </Link>
                 </nav>
             </header>
         </>

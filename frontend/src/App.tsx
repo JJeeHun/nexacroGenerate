@@ -3,18 +3,23 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DatasetView from "./view/DatasetView";
 import Header from "./view/Header";
 import TableList from "./view/TableList";
+import Requires from "./view/Requires";
+import Columns from "./view/Columns";
+import Crud from "./view/Crud";
 
 export type Columns = {
     COLUMN_NAME: string;
-    DATE_TYPE: string;
+    DATA_TYPE: string;
     CHARACTER_MAXIMUM_LENGTH: number;
     COLUMN_DEFAULT: string;
     IS_NULLABLE: string;
     TABLE_NAME: string;
+    COLUMN_KEY: string;
 };
 
 export type Table = {
     TABLE_NAME: string;
+    TABLE_COMMENT: string;
 };
 
 export type Tables = Table[];
@@ -36,7 +41,7 @@ const App: React.FC = () => {
     const [selectTable, setSelectTable] = useState<string>("board");
 
     useEffect(() => {
-        fetch("http://localhost:5110/list")
+        fetch("http://192.168.0.217:5110/list")
             .then((res) => res.json())
             .then((data) => setReponse(data))
             .catch((error) => console.log(error));
@@ -56,6 +61,7 @@ const App: React.FC = () => {
                             style={{
                                 display: "flex",
                                 height: "calc(100% - 51px)",
+                                position: 'relative'
                             }}
                         >
                             <TableList
@@ -66,6 +72,18 @@ const App: React.FC = () => {
                                 <Route
                                     path="/dataset"
                                     element={<DatasetView />}
+                                />
+                                <Route
+                                    path="/requires"
+                                    element={<Requires />}
+                                />
+                                <Route
+                                    path="/columns"
+                                    element={<Columns />}
+                                />
+                                <Route
+                                    path="/crud"
+                                    element={<Crud />}
                                 />
                             </Routes>
                         </div>

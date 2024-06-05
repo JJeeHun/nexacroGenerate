@@ -1,16 +1,21 @@
 .table-list {
     border-right: 1px solid black;
+    position: relative;
 }
-.table-list > button {
+.table-list .box {
+    overflow-y: scroll;
+    height: calc(100% - 55px);
+}
+.table-list  button {
     display: flex;
     flex-direction: column;
     border: none;
     background-color: transparent;
-    font-size: 1.2rem;
+    font-size: .8rem;
     margin: auto;
     padding: 5px;
 }
-.table-list > button:hover {
+.table-list  button:hover {
     cursor: pointer;
 }
 

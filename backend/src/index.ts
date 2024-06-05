@@ -6,12 +6,12 @@ import { createCipheriv } from "crypto";
 
 const app = express();
 const port = process.env.PORT || 5110;
-const schema = "board";
+const schema = "sycw";
 
 const pool = mariadb.createPool({
-    host: "localhost",
-    user: "admin",
-    password: "admin88",
+    host: "192.168.0.50",
+    user: "sycwa",
+    password: "sycwwms1234",
     database: schema,
     port: 3306,
     bigNumberStrings: true,
@@ -25,6 +25,7 @@ app.use(express.static(path.join(__dirname, "../../frontend/build")));
 
 type Table = {
     TABLE_NAME: string;
+    TABLE_COMMENT: string;
 };
 
 type Tables = Table[];
@@ -36,6 +37,7 @@ type Columns = {
     COLUMN_DEFAULT: string;
     IS_NULLABLE: string;
     TABLE_NAME: string;
+    COLUMN_KEY: string;
 };
 
 let tableList: Tables;
@@ -57,7 +59,8 @@ const query = async (query: string) => {
 
 const getTables = async () => {
     return query(`SELECT 
-                        TABLE_NAME 
+                        TABLE_NAME ,
+                        TABLE_COMMENT
                     FROM 
                         INFORMATION_SCHEMA.TABLES 
                     WHERE 
@@ -73,6 +76,7 @@ const getColumns = async (tables: Tables) => {
                             CHARACTER_MAXIMUM_LENGTH, 
                             IS_NULLABLE, 
                             COLUMN_DEFAULT,
+                            COLUMN_KEY,
                             '${table.TABLE_NAME}' as TABLE_NAME
                         FROM 
                             INFORMATION_SCHEMA.COLUMNS 
@@ -85,19 +89,35 @@ const getColumns = async (tables: Tables) => {
     return query(unionQuery);
 };
 
+// app.get("/list", async (req, res) => {
+//     if (!tableList) tableList = await getTables();
+//     if (!tableInfo) {
+//         tableInfo = {};
+//         const columns: Columns[] = await getColumns(tableList);
+
+//         columns.forEach((column) => {
+//             tableInfo[column.TABLE_NAME] = tableInfo[column.TABLE_NAME] || [];
+//             tableInfo[column.TABLE_NAME].push(column);
+//         });
+//     }
+
+//     res.json({ table_list: tableList, table_info: tableInfo });
+// });
+
 app.get("/list", async (req, res) => {
-    if (!tableList) tableList = await getTables();
-    if (!tableInfo) {
-        tableInfo = {};
-        const columns: Columns[] = await getColumns(tableList);
+    console.log('조회');
+    const tableList = await getTables();
+    
+    const tableInfo:any = {};
+    const columns: Columns[] = await getColumns(tableList);
 
-        columns.forEach((column) => {
-            tableInfo[column.TABLE_NAME] = tableInfo[column.TABLE_NAME] || [];
-            tableInfo[column.TABLE_NAME].push(column);
-        });
-    }
+    columns.forEach((column) => {
+        tableInfo[column.TABLE_NAME] = tableInfo[column.TABLE_NAME] || [];
+        tableInfo[column.TABLE_NAME].push(column);
+    });
+    
 
-    res.json({ table_list: tableList, table_info: tableInfo });
+    await res.json({ table_list: tableList, table_info: tableInfo });
 });
 
 app.get("*", (req, res) => {

@@ -1,0 +1,44 @@
+.main-container {    
+    width: 84%;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: minmax(50px, auto); /* Added for row height */
+    gap: 1px;
+    max-width: 800px;
+    width: 100%;
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    font-weight: bold;
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+.cell {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.cell:nth-child(4n+1) {
+    background-color: #f2f2f2;
+}
+
+.cell:nth-child(4n+2) {
+    background-color: #f2f2f2;
+}
+
+.cell:nth-child(4n+3) {
+    background-color: #f2f2f2;
+}
+
+.cell:nth-child(4n+4) {
+    background-color: #f2f2f2;
+}

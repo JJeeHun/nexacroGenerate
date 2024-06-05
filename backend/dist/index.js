@@ -18,11 +18,11 @@ const path_1 = __importDefault(require("path"));
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const port = process.env.PORT || 5110;
-const schema = "board";
+const schema = "sycw";
 const pool = mariadb_1.default.createPool({
-    host: "localhost",
-    user: "admin",
-    password: "admin88",
+    host: "192.168.0.50",
+    user: "sycwa",
+    password: "sycwwms1234",
     database: schema,
     port: 3306,
     bigNumberStrings: true,
@@ -50,7 +50,8 @@ const query = (query) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const getTables = () => __awaiter(void 0, void 0, void 0, function* () {
     return query(`SELECT 
-                        TABLE_NAME 
+                        TABLE_NAME ,
+                        TABLE_COMMENT
                     FROM 
                         INFORMATION_SCHEMA.TABLES 
                     WHERE 
@@ -64,6 +65,7 @@ const getColumns = (tables) => __awaiter(void 0, void 0, void 0, function* () {
                             CHARACTER_MAXIMUM_LENGTH, 
                             IS_NULLABLE, 
                             COLUMN_DEFAULT,
+                            COLUMN_KEY,
                             '${table.TABLE_NAME}' as TABLE_NAME
                         FROM 
                             INFORMATION_SCHEMA.COLUMNS 
@@ -73,18 +75,27 @@ const getColumns = (tables) => __awaiter(void 0, void 0, void 0, function* () {
         .join("\r\nunion\r\n");
     return query(unionQuery);
 });
+// app.get("/list", async (req, res) => {
+//     if (!tableList) tableList = await getTables();
+//     if (!tableInfo) {
+//         tableInfo = {};
+//         const columns: Columns[] = await getColumns(tableList);
+//         columns.forEach((column) => {
+//             tableInfo[column.TABLE_NAME] = tableInfo[column.TABLE_NAME] || [];
+//             tableInfo[column.TABLE_NAME].push(column);
+//         });
+//     }
+//     res.json({ table_list: tableList, table_info: tableInfo });
+// });
 app.get("/list", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!tableList)
-        tableList = yield getTables();
-    if (!tableInfo) {
-        tableInfo = {};
-        const columns = yield getColumns(tableList);
-        columns.forEach((column) => {
-            tableInfo[column.TABLE_NAME] = tableInfo[column.TABLE_NAME] || [];
-            tableInfo[column.TABLE_NAME].push(column);
-        });
-    }
-    res.json({ table_list: tableList, table_info: tableInfo });
+    const tableList = yield getTables();
+    const tableInfo = {};
+    const columns = yield getColumns(tableList);
+    columns.forEach((column) => {
+        tableInfo[column.TABLE_NAME] = tableInfo[column.TABLE_NAME] || [];
+        tableInfo[column.TABLE_NAME].push(column);
+    });
+    yield res.json({ table_list: tableList, table_info: tableInfo });
 }));
 app.get("*", (req, res) => {
     res.sendFile(path_1.default.join(__dirname, "../../frontend/build", "index.html"));
