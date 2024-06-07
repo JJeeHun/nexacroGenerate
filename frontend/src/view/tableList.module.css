@@ -1,6 +1,7 @@
 .table-list {
     border-right: 1px solid black;
     position: relative;
+    overflow: hidden;
 }
 .table-list .box {
     overflow-y: scroll;

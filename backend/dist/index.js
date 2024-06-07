@@ -48,6 +48,19 @@ const query = (query) => __awaiter(void 0, void 0, void 0, function* () {
             conn.release();
     }
 });
+const getClientIP = (req) => {
+    // x-forwarded-for 헤더가 있는 경우 그 값을 사용
+    let clientIp = req.headers['x-forwarded-for'];
+    // x-forwarded-for 헤더가 없는 경우 req.connection.remoteAddress 사용
+    if (!clientIp) {
+        clientIp = req.socket.remoteAddress || '';
+    }
+    // IPv6 형식의 주소가 "::ffff:"로 시작하는 경우 IPv4 주소만 가져오도록 처리
+    if (clientIp.startsWith('::ffff:')) {
+        clientIp = clientIp.substring(7);
+    }
+    return clientIp;
+};
 const getTables = () => __awaiter(void 0, void 0, void 0, function* () {
     return query(`SELECT 
                         TABLE_NAME ,
@@ -66,6 +79,7 @@ const getColumns = (tables) => __awaiter(void 0, void 0, void 0, function* () {
                             IS_NULLABLE, 
                             COLUMN_DEFAULT,
                             COLUMN_KEY,
+                            COLUMN_COMMENT,
                             '${table.TABLE_NAME}' as TABLE_NAME
                         FROM 
                             INFORMATION_SCHEMA.COLUMNS 
@@ -88,6 +102,7 @@ const getColumns = (tables) => __awaiter(void 0, void 0, void 0, function* () {
 //     res.json({ table_list: tableList, table_info: tableInfo });
 // });
 app.get("/list", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(`요청 URL = ${req.url}, Client IP => ${getClientIP(req)}, Date => ${new Date().toLocaleTimeString()}`);
     const tableList = yield getTables();
     const tableInfo = {};
     const columns = yield getColumns(tableList);

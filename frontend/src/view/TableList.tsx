@@ -13,11 +13,11 @@ export default ({ table_list, onClick }: Props) => {
     if(filterString) {
         table_list = table_list?.filter(
             table => (table.TABLE_NAME+table.TABLE_COMMENT).toUpperCase().includes(filterString.toUpperCase())
-    );
+        );
     }
     return (
         <>
-            <div className={css["table-list"]}>
+            <div className={css["table-list"]} >
                 <div style={{padding: '10px 20px'}}>
                     <label htmlFor="searchTable" style={{marginRight:10}}>테이블명</label>
                     <input type="text" id="searchTable" onChange={({target}) => setFilterString(target.value)}/>

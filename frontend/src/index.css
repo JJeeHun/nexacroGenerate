@@ -154,7 +154,7 @@ main {
 
 ::-webkit-scrollbar {
     width: 5px;  /* 세로축 스크롤바 폭 너비 */
-    height: 20px;
+    height: 5px;
     border-radius: 5px;
     border: 1px solid lightgray;
 }

@@ -15,6 +15,7 @@ export type Columns = {
     IS_NULLABLE: string;
     TABLE_NAME: string;
     COLUMN_KEY: string;
+    COLUMN_COMMENT: string;
 };
 
 export type Table = {

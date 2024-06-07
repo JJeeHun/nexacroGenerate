@@ -1,8 +1,7 @@
-import express from "express";
+import express,{Request} from "express";
 import mariadb from "mariadb";
 import path from "path";
 import cors from "cors";
-import { createCipheriv } from "crypto";
 
 const app = express();
 const port = process.env.PORT || 5110;
@@ -38,6 +37,7 @@ type Columns = {
     IS_NULLABLE: string;
     TABLE_NAME: string;
     COLUMN_KEY: string;
+    COLUMN_COMMENT: string;
 };
 
 let tableList: Tables;
@@ -56,6 +56,23 @@ const query = async (query: string) => {
         if (conn) conn.release();
     }
 };
+
+const getClientIP = (req:Request) => {
+    // x-forwarded-for 헤더가 있는 경우 그 값을 사용
+    let clientIp = req.headers['x-forwarded-for'] as string | undefined;
+    
+    // x-forwarded-for 헤더가 없는 경우 req.connection.remoteAddress 사용
+    if (!clientIp) {
+        clientIp = req.socket.remoteAddress || '';
+    }
+
+    // IPv6 형식의 주소가 "::ffff:"로 시작하는 경우 IPv4 주소만 가져오도록 처리
+    if (clientIp.startsWith('::ffff:')) {
+        clientIp = clientIp.substring(7);
+    }
+    return clientIp;
+}
+
 
 const getTables = async () => {
     return query(`SELECT 
@@ -77,6 +94,7 @@ const getColumns = async (tables: Tables) => {
                             IS_NULLABLE, 
                             COLUMN_DEFAULT,
                             COLUMN_KEY,
+                            COLUMN_COMMENT,
                             '${table.TABLE_NAME}' as TABLE_NAME
                         FROM 
                             INFORMATION_SCHEMA.COLUMNS 
@@ -105,7 +123,8 @@ const getColumns = async (tables: Tables) => {
 // });
 
 app.get("/list", async (req, res) => {
-    console.log('조회');
+    
+    console.log(`요청 URL = ${req.url}, Client IP => ${getClientIP(req)}, Date => ${new Date().toLocaleTimeString()}`);
     const tableList = await getTables();
     
     const tableInfo:any = {};
