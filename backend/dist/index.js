@@ -80,7 +80,8 @@ const getColumns = (tables) => __awaiter(void 0, void 0, void 0, function* () {
                             COLUMN_DEFAULT,
                             COLUMN_KEY,
                             COLUMN_COMMENT,
-                            '${table.TABLE_NAME}' as TABLE_NAME
+                            '${table.TABLE_NAME}' as TABLE_NAME,
+                            '${table.TABLE_COMMENT}' as TABLE_COMMENT
                         FROM 
                             INFORMATION_SCHEMA.COLUMNS 
                         WHERE 
@@ -88,6 +89,11 @@ const getColumns = (tables) => __awaiter(void 0, void 0, void 0, function* () {
                         AND TABLE_NAME = '${table.TABLE_NAME}'`)
         .join("\r\nunion\r\n");
     return query(unionQuery);
+});
+const getMessage = () => __awaiter(void 0, void 0, void 0, function* () {
+    return query(`
+        select * from comm_msg_m
+    `);
 });
 // app.get("/list", async (req, res) => {
 //     if (!tableList) tableList = await getTables();
@@ -111,6 +117,9 @@ app.get("/list", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         tableInfo[column.TABLE_NAME].push(column);
     });
     yield res.json({ table_list: tableList, table_info: tableInfo });
+}));
+app.get("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield res.json(yield getMessage());
 }));
 app.get("*", (req, res) => {
     res.sendFile(path_1.default.join(__dirname, "../../frontend/build", "index.html"));

@@ -95,7 +95,8 @@ const getColumns = async (tables: Tables) => {
                             COLUMN_DEFAULT,
                             COLUMN_KEY,
                             COLUMN_COMMENT,
-                            '${table.TABLE_NAME}' as TABLE_NAME
+                            '${table.TABLE_NAME}' as TABLE_NAME,
+                            '${table.TABLE_COMMENT}' as TABLE_COMMENT
                         FROM 
                             INFORMATION_SCHEMA.COLUMNS 
                         WHERE 
@@ -106,6 +107,12 @@ const getColumns = async (tables: Tables) => {
 
     return query(unionQuery);
 };
+
+const getMessage = async () => {
+    return query(`
+        select * from comm_msg_m
+    `);
+}
 
 // app.get("/list", async (req, res) => {
 //     if (!tableList) tableList = await getTables();
@@ -137,6 +144,10 @@ app.get("/list", async (req, res) => {
     
 
     await res.json({ table_list: tableList, table_info: tableInfo });
+});
+
+app.get("/message", async (req,res) => {
+    await res.json(await getMessage());
 });
 
 app.get("*", (req, res) => {

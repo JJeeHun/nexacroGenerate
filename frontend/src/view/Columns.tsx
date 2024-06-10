@@ -32,7 +32,10 @@ const Column = ({column,tableName}:Props) => {
     const color = tableColors[tableName];
     return <>
         <div className={css.cell} style={{color}}>
-            {tableName}
+            {column.TABLE_NAME}
+        </div>
+        <div className={css.cell} style={{color}}>
+            {column.TABLE_COMMENT}
         </div>
         <div className={css.cell}>
             {column.COLUMN_NAME}
@@ -81,6 +84,7 @@ export default () => {
         </section>
         <section className={css['grid-container']}>
             <div className={css.header}>Table</div>
+            <div className={css.header}>Table Comment</div>
             <div className={css.header}>Column</div>
             <div className={css.header}>Comment</div>
             <div className={css.header}>Length</div>
