@@ -1,6 +1,6 @@
 function copyMainText(target:any) {
     // Get the text from the main tag
-    var mainText:any = target?.textContent;
+    var mainText:any = typeof target == 'string' ? target : target?.textContent;
 
     // Use the Clipboard API to copy the text
     if(navigator.clipboard) {

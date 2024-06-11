@@ -21,6 +21,9 @@ export default () => {
                     <Link to="/message" className={css["link-button"]}>
                         Message
                     </Link>
+                    <Link to="/common-code" className={css["link-button"]}>
+                        Common Codes
+                    </Link>
                 </nav>
             </header>
         </>

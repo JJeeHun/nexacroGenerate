@@ -95,6 +95,30 @@ const getMessage = () => __awaiter(void 0, void 0, void 0, function* () {
         select * from comm_msg_m
     `);
 });
+const getCommonCodes = () => __awaiter(void 0, void 0, void 0, function* () {
+    const rootCodes = yield query(`select code_grp,
+                code_cd,
+                code_knm,
+                code_enm,
+                sub_cd,
+                sub_cd1,
+                code_ex
+            from tb_cs0100
+            where CODE_GRP = '000'
+    `);
+    const childCodesString = rootCodes.map((code) => {
+        return `select code_grp,
+                    code_cd,
+                    code_knm,
+                    code_enm,
+                    sub_cd,
+                    sub_cd1,
+                    code_ex
+                from tb_cs0100
+                where CODE_GRP = '${code.code_cd}'`;
+    }).join('union ');
+    return yield query(childCodesString);
+});
 // app.get("/list", async (req, res) => {
 //     if (!tableList) tableList = await getTables();
 //     if (!tableInfo) {
@@ -120,6 +144,9 @@ app.get("/list", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 app.get("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield res.json(yield getMessage());
+}));
+app.get('/common-code', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield res.json(yield getCommonCodes());
 }));
 app.get("*", (req, res) => {
     res.sendFile(path_1.default.join(__dirname, "../../frontend/build", "index.html"));

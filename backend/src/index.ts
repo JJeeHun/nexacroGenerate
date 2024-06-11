@@ -114,6 +114,33 @@ const getMessage = async () => {
     `);
 }
 
+const getCommonCodes = async () => {
+    const rootCodes = await query(`select code_grp,
+                code_cd,
+                code_knm,
+                code_enm,
+                sub_cd,
+                sub_cd1,
+                code_ex
+            from tb_cs0100
+            where CODE_GRP = '000'
+    `);
+
+    const childCodesString = rootCodes.map( (code:any) => {        
+        return `select code_grp,
+                    code_cd,
+                    code_knm,
+                    code_enm,
+                    sub_cd,
+                    sub_cd1,
+                    code_ex
+                from tb_cs0100
+                where CODE_GRP = '${code.code_cd}'`
+    }).join('union ')
+
+    return await query(childCodesString);
+}
+
 // app.get("/list", async (req, res) => {
 //     if (!tableList) tableList = await getTables();
 //     if (!tableInfo) {
@@ -149,6 +176,10 @@ app.get("/list", async (req, res) => {
 app.get("/message", async (req,res) => {
     await res.json(await getMessage());
 });
+
+app.get('/common-code', async (req,res) => {
+    await res.json(await getCommonCodes());
+})
 
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../../frontend/build", "index.html"));
