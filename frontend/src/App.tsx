@@ -55,6 +55,10 @@ export interface CommonCodeType {
 export const TableContext = createContext("");
 export const TableDataContext = createContext({});
 
+const rootUrl = 'http://192.168.0.217:3000';
+// const rootUrl = 'http://192.168.0.175:3000';
+// const rootUrl = 'http://121.166.127.15:3000';
+
 const App: React.FC = () => {
     const [response, setReponse] = useState<Response>({});
     const [messages, setMessages] = useState<MessageType[]>([]);
@@ -65,21 +69,21 @@ const App: React.FC = () => {
     const [isShow, setShow] = useState<boolean>(true);
 
     useEffect( () => {
-        fetch("http://192.168.0.217:5110/list")
+        fetch(rootUrl+"/list")
             .then((res) => res.json())
             .then((tables) => {
                 setReponse(tables);
             })
             .catch((error) => console.log(error));
 
-        fetch("http://192.168.0.217:5110/message")
+        fetch(rootUrl+"/message")
             .then((res) => res.json())
             .then( messages => {                
                 setMessages(messages);
             })
             .catch((error) => console.log(error));
 
-        fetch("http://192.168.0.217:5110/common-code")
+        fetch(rootUrl+"/common-code")
             .then((res) => res.json())
             .then( commonCodes => {
                 setCommonCodes(commonCodes);
@@ -94,9 +98,9 @@ const App: React.FC = () => {
     return (
         <>
             <BrowserRouter>
-                <Header />
-                <TableDataContext.Provider value={{ tableInfo ,messages ,commonCodes,setShow }}>
+                <TableDataContext.Provider value={{ tableInfo ,messages ,commonCodes,isShow, setShow }}>
                     <TableContext.Provider value={selectTable}>
+                        <Header />
                         <div
                             style={{
                                 display: "flex",

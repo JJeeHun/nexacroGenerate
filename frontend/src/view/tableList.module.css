@@ -2,6 +2,7 @@
     border-right: 1px solid black;
     position: relative;
     overflow: hidden;
+    max-width: 300px;
 }
 .table-list .box {
     overflow-y: scroll;
@@ -15,6 +16,8 @@
     font-size: .8rem;
     margin: auto;
     padding: 5px;
+
+    transition: width .3s ease-in-out;
 }
 .table-list  button:hover {
     cursor: pointer;
@@ -22,4 +25,13 @@
 
 .table-list .active {
     color: lightblue;
+}
+
+.slide-button {
+    display: inline-block !important;
+    margin-left: 5px !important;
+}
+
+.slide-button:hover {
+    color: red;
 }

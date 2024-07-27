@@ -24,7 +24,7 @@ export default ({ table_list,isShow, onClick }: Props) => {
             <div className={css["table-list"]} style={{width : isShow ? '' : 0}}>
                 <div style={{padding: '10px 20px'}}>
                     <label htmlFor="searchTable" style={{marginRight:10}}>테이블명</label>
-                    <input type="text" id="searchTable" onChange={({target}) => setFilterString(target.value)}/>
+                    <input type="text" id="searchTable" style={{width: 150}} onChange={({target}) => setFilterString(target.value)}/>
                 </div>
                 <hr />
                 <div className={css["box"]}>

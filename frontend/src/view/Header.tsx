@@ -1,10 +1,16 @@
 import { Link } from "react-router-dom";
 import css from "./header.module.css";
+import { TableDataContext } from "../App";
+import { useContext } from "react";
 
 export default () => {
+    const ctx = useContext<any>(TableDataContext);
+    const showText = ctx.isShow ? '<' : '>';
+    const setShow = ctx?.setShow;
+
     return (
         <>
-            <header style={{ borderBottom: "1px solid black" }}>
+            <header style={{ borderBottom: "1px solid black" ,position:'relative'}}>
                 <nav className={css.nav}>
                     <Link to="/columns" className={css["link-button"]}>
                         Columns
@@ -25,6 +31,7 @@ export default () => {
                         Common Codes
                     </Link>
                 </nav>
+                <button className={css['slide-button']} onClick={() => setShow((prev:boolean) => !prev)}>{showText}</button>
             </header>
         </>
     );

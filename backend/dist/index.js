@@ -17,7 +17,7 @@ const mariadb_1 = __importDefault(require("mariadb"));
 const path_1 = __importDefault(require("path"));
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
-const port = process.env.PORT || 5110;
+const port = process.env.PORT || 3000;
 const schema = "sycw";
 const pool = mariadb_1.default.createPool({
     host: "192.168.0.50",
@@ -106,7 +106,9 @@ const getCommonCodes = () => __awaiter(void 0, void 0, void 0, function* () {
             from tb_cs0100
             where CODE_GRP = '000'
     `);
-    const childCodesString = rootCodes.map((code) => {
+    if (!Array.isArray(rootCodes))
+        return [];
+    const childCodesString = rootCodes === null || rootCodes === void 0 ? void 0 : rootCodes.map((code) => {
         return `select code_grp,
                     code_cd,
                     code_knm,
@@ -131,16 +133,28 @@ const getCommonCodes = () => __awaiter(void 0, void 0, void 0, function* () {
 //     }
 //     res.json({ table_list: tableList, table_info: tableInfo });
 // });
-app.get("/list", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(`요청 URL = ${req.url}, Client IP => ${getClientIP(req)}, Date => ${new Date().toLocaleTimeString()}`);
-    const tableList = yield getTables();
-    const tableInfo = {};
-    const columns = yield getColumns(tableList);
-    columns.forEach((column) => {
-        tableInfo[column.TABLE_NAME] = tableInfo[column.TABLE_NAME] || [];
-        tableInfo[column.TABLE_NAME].push(column);
+const temp_copy = (tableList) => {
+    tableList.forEach(tableInfo => {
+        console.log(`INSERT INTO sycwdev.${tableInfo.TABLE_NAME} SELECT * FROM sycw.${tableInfo.TABLE_NAME}`);
     });
-    yield res.json({ table_list: tableList, table_info: tableInfo });
+};
+app.get("/list", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(`요청 URL = ${req.url}, Client IP => ${getClientIP(req)}, Date => ${new Date().toLocaleString()}`);
+        let tableList = yield getTables();
+        tableList = (tableList === null || tableList === void 0 ? void 0 : tableList.filter(table => !(table.TABLE_NAME.includes('_del') || table.TABLE_NAME.includes('_bak')))) || [];
+        const tableInfo = {};
+        const columns = yield getColumns(tableList);
+        columns.forEach((column) => {
+            tableInfo[column.TABLE_NAME] = tableInfo[column.TABLE_NAME] || [];
+            tableInfo[column.TABLE_NAME].push(column);
+        });
+        yield res.json({ table_list: tableList, table_info: tableInfo });
+    }
+    catch (e) {
+        console.log(e);
+        res.json({ table_list: [], table_info: {} });
+    }
 }));
 app.get("/message", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield res.json(yield getMessage());

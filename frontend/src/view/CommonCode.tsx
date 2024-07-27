@@ -59,7 +59,7 @@ export default () => {
     const [filter,setFilter] = useState<string>('');
     
     if(filter) {
-        codes = codes.filter(code => (code.code_grp+code.code_cd+code.code_enm).toLocaleUpperCase().includes(filter.toUpperCase()) );
+        codes = codes.filter(code => (code.code_grp+code.code_cd+code.code_enm+code.code_ex).toLocaleUpperCase().includes(filter.toUpperCase()) );
 
         const findGroups = codes.map(code => code.code_grp);
         filterGroupCodes = allCodes.filter(code => findGroups.includes(code.code_grp));
@@ -83,6 +83,13 @@ export default () => {
                 <div className={css.header}>Sub2</div>
 
                 {codes?.map((code) => <Code key={code.code_grp+code.code_cd} code={code}/>)}
+                <hr />
+                <hr />
+                <hr />
+                <hr />
+                <hr />
+                <hr />
+                {filterGroupCodes?.filter(code => code.sub_cd?.includes('Contact CD')).map((code) => <Code key={code.code_grp+code.code_cd} code={code}/>)}
                 <hr />
                 <hr />
                 <hr />

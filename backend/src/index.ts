@@ -4,7 +4,7 @@ import path from "path";
 import cors from "cors";
 
 const app = express();
-const port = process.env.PORT || 5110;
+const port = process.env.PORT || 3000;
 const schema = "sycw";
 
 const pool = mariadb.createPool({
@@ -126,7 +126,9 @@ const getCommonCodes = async () => {
             where CODE_GRP = '000'
     `);
 
-    const childCodesString = rootCodes.map( (code:any) => {        
+    if(!Array.isArray(rootCodes)) return [];
+
+    const childCodesString = rootCodes?.map( (code:any) => {        
         return `select code_grp,
                     code_cd,
                     code_knm,
@@ -156,21 +158,33 @@ const getCommonCodes = async () => {
 //     res.json({ table_list: tableList, table_info: tableInfo });
 // });
 
+const temp_copy = (tableList:Tables) => {
+    tableList.forEach(tableInfo => {
+        console.log(`INSERT INTO sycwdev.${tableInfo.TABLE_NAME} SELECT * FROM sycw.${tableInfo.TABLE_NAME}`)
+    })
+}
+
 app.get("/list", async (req, res) => {
     
-    console.log(`요청 URL = ${req.url}, Client IP => ${getClientIP(req)}, Date => ${new Date().toLocaleTimeString()}`);
-    const tableList = await getTables();
+    try{
+        console.log(`요청 URL = ${req.url}, Client IP => ${getClientIP(req)}, Date => ${new Date().toLocaleString()}`);
+        let tableList:Tables = await getTables();
+            tableList = tableList?.filter(table => !(table.TABLE_NAME.includes('_del') || table.TABLE_NAME.includes('_bak'))) || [];
     
-    const tableInfo:any = {};
-    const columns: Columns[] = await getColumns(tableList);
-
-    columns.forEach((column) => {
-        tableInfo[column.TABLE_NAME] = tableInfo[column.TABLE_NAME] || [];
-        tableInfo[column.TABLE_NAME].push(column);
-    });
+        const tableInfo:any = {};
+        const columns: Columns[] = await getColumns(tableList);
     
-
-    await res.json({ table_list: tableList, table_info: tableInfo });
+        columns.forEach((column) => {
+            tableInfo[column.TABLE_NAME] = tableInfo[column.TABLE_NAME] || [];
+            tableInfo[column.TABLE_NAME].push(column);
+        });
+        
+    
+        await res.json({ table_list: tableList, table_info: tableInfo });
+    }catch(e) {
+        console.log(e);
+        res.json({ table_list: [], table_info: {} });
+    }
 });
 
 app.get("/message", async (req,res) => {

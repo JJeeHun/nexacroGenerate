@@ -50,10 +50,10 @@ const Column = ({column,tableName}:Props) => {
             {column.DATA_TYPE}
         </div>
         <div className={css.cell}>
-            {column.IS_NULLABLE}
+            {column.IS_NULLABLE == 'YES' ? '' : <input type="checkbox" checked  readOnly/>}
         </div>
         <div className={css.cell}>
-            {column.COLUMN_KEY === 'PRI' ? <input type="checkbox" checked/> : ''}
+            {column.COLUMN_KEY === 'PRI' ? <input type="checkbox" checked readOnly/> : ''}
         </div>
     </>
 }
@@ -61,7 +61,9 @@ const Column = ({column,tableName}:Props) => {
 export default () => {
     const [filterColumn,setFilterColumn] = useState<string>('');
     const selectTable = useContext(TableContext);
-    let tableInfo:{[any:string]: Columns[]} = useContext<any>(TableDataContext)?.tableInfo || {};
+    const ctx = useContext<any>(TableDataContext);
+    const isShow:boolean = ctx.isShow;
+    let tableInfo:{[any:string]: Columns[]} = ctx?.tableInfo || {};
     
     if(!filterColumn) {
         tableInfo = {[selectTable]: tableInfo[selectTable]};
@@ -69,16 +71,27 @@ export default () => {
         const newTableInfo:{[any:string]: Columns[]} = {};
         for(const tableName in tableInfo) {
             const columns = tableInfo[tableName];
-            const filterData = columns.filter(column => (column.COLUMN_NAME + column.COLUMN_COMMENT).toUpperCase().includes( filterColumn.toUpperCase()) );
+            let filterData;
+            
+            if(filterColumn.includes(',')) {
+                const findList = filterColumn.split(',').map(find => find.toUpperCase());
+                filterData = columns.filter(column => findList.some(find => ( (column.TABLE_NAME + column.COLUMN_NAME + column.COLUMN_COMMENT).toUpperCase()).includes(find) ) );
+            }else {
+                filterData = columns.filter(column => (column.TABLE_NAME + column.COLUMN_NAME + column.COLUMN_COMMENT).toUpperCase().includes( filterColumn.toUpperCase()) );
+            }
+
             newTableInfo[tableName] = filterData;
         }
         tableInfo = newTableInfo;
     }
 
-    return <main className={css['main-container']}>
+    return <main className={css['main-container']} style={{width: (isShow ? '' : '100%')}}>
         <section style={{padding: '10px 20px'}}>
-            <label htmlFor="search_column">찾을 컬럼명 or Comment : </label>
-            <input type="text" id="search_column" onChange={({target}) => {
+            <label htmlFor="search_column">Find Table or Column or Comment : </label>
+            <input type="text" id="search_column" onKeyUp={(e) => {
+                if( e.key != 'Enter') return;
+                
+                const target = e.target as HTMLInputElement;
                 setFilterColumn(target.value);
             }}/>
         </section>
@@ -89,7 +102,7 @@ export default () => {
             <div className={css.header}>Comment</div>
             <div className={css.header}>Length</div>
             <div className={css.header}>Data Type</div>
-            <div className={css.header}>is Null</div>
+            <div className={css.header}>is Require</div>
             <div className={css.header}>PK</div>
             {
                 Object?.entries(tableInfo)
